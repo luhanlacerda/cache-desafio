@@ -17,7 +17,7 @@ public class UserApiApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		int vale = digitoUnicoService.calculaDigitoUnico("1010",2);
+		int vale = digitoUnicoService.calcularDigitoUnico("1010",2);
 		System.out.println(vale);
 	}
 }
