@@ -1,5 +1,6 @@
 package lacerda.luhan;
 
+import lacerda.luhan.service.DigitoUnicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
