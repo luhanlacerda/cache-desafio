@@ -66,21 +66,24 @@ public class UsuarioController {
 
     @PostMapping("/calculate")
     public ResponseEntity<?> calculateOneDigit(@RequestBody String body) {
-        JsonObject json = JsonConverterUtils.convertToJsonObject(body);
-        Optional<Usuario> usuarioFromRepo = userRepository.findByNome(JsonConverterUtils.getStringJsonValue(json, NOME_USUARIO_JSON_KEY));
-        if (usuarioFromRepo.isPresent()) {
-            Usuario usuario = usuarioFromRepo.get();
-            Resultado resultado = ResultadoConverter.buildResultado(json, usuario);
-            resultado.calcularDigitoUnico();
-            resultado = resultadoRepository.save(resultado);
-            return ResponseEntity.ok(resultado);
-        } else {
-            return ResponseEntity.badRequest().build();
+        try {
+            JsonObject json = JsonConverterUtils.convertToJsonObject(body);
+            Optional<Usuario> usuarioFromRepo = userRepository.findByNome(JsonConverterUtils.getStringJsonValue(json, NOME_USUARIO_JSON_KEY));
+            if (usuarioFromRepo.isPresent()) {
+                Usuario usuario = usuarioFromRepo.get();
+                Resultado resultado = ResultadoConverter.buildResultado(json, usuario);
+                resultado.calcularDigitoUnico();
+                resultado = resultadoRepository.save(resultado);
+                return ResponseEntity.ok(resultado);
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+        } catch (Exception e) {
+            String loggerMessage = "Erro ao tentar calcular o digito unico - [ " + e.getMessage() + " ]";
+            logger.error(loggerMessage);
+            return ResponseEntity.badRequest().body(loggerMessage);
         }
-    }
 
-    private JsonObject convert(String body) {
-        return new Gson().fromJson(body, JsonObject.class);
     }
 
 }

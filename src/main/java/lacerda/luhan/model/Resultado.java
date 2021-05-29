@@ -34,6 +34,12 @@ public class Resultado {
         this.usuario = usuario;
     }
 
+    public Resultado(String valorEntrada, int qtdConcatenacao) {
+        this.valorEntrada = valorEntrada;
+        this.qtdConcatenacao = qtdConcatenacao;
+        this.usuario = new Usuario();
+    }
+
     public void calcularDigitoUnico() {
         this.resultado = this.valorEntrada.repeat(this.qtdConcatenacao)
                 .chars()
