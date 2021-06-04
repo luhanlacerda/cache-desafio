@@ -36,4 +36,14 @@ public class ResultadoConverterTest {
         assertEquals(2, resultado.getQtdConcatenacao());
     }
 
+    @Test
+    void convertStringToJsonObjectUsingEmptyConstructorSuccessTest() throws Exception {
+        this.resultado = new Resultado();
+        this.resultado = ResultadoConverter.buildResultado(jsonObject, usuario);
+        assertNotNull(resultado);
+        assertNotNull(ResultadoConverter.buildResultado(jsonObject, usuario));
+        assertEquals("1010", resultado.getValorEntrada());
+        assertEquals(2, resultado.getQtdConcatenacao());
+    }
+
 }

@@ -34,6 +34,12 @@ public class Usuario {
         this.resultados = new HashSet<>();
     }
 
+    public Usuario(String nome, String email) {
+        this.nome = nome;
+        this.email = email;
+        this.resultados = new HashSet<>();
+    }
+
     public Usuario(UsuarioDTO usuarioDTO) {
         this.nome = usuarioDTO.getNome();
         this.email = usuarioDTO.getEmail();

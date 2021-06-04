@@ -18,8 +18,12 @@ public class UsuarioConverter {
         return usuariosDTO;
     }
 
-    public static boolean isDTOValid(UsuarioDTO usuarioDTO) {
-        return !usuarioDTO.getNome().isEmpty() && !usuarioDTO.getEmail().isEmpty();
+    public static boolean isDTOValid(UsuarioDTO usuarioDTO) throws Exception {
+        try {
+            return !usuarioDTO.getNome().isEmpty() && !usuarioDTO.getEmail().isEmpty();
+        } catch (Exception e) {
+            throw new Exception("Erro ao validar a classe DTO - " + e.getMessage());
+        }
     }
 
 }

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,7 @@ public class UsuarioController {
     @Autowired
     private ResultadoRepository resultadoRepository;
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllUsuarios() {
         try {
             List<Usuario> usuarioList = userRepository.findAll();
@@ -47,25 +48,27 @@ public class UsuarioController {
 
     }
 
-    @PostMapping("/save")
+    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveUsuario(@RequestBody UsuarioDTO usuarioDto) {
+        String loggerMessage = "Erro ao tentar salvar o usuario";
         try {
             if (UsuarioConverter.isDTOValid(usuarioDto)) {
                 Usuario usuario = new Usuario(usuarioDto);
                 userRepository.save(usuario);
                 return ResponseEntity.ok("Usuario criado com sucesso!");
             } else {
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.badRequest().body(loggerMessage);
             }
         } catch (Exception e) {
-            String loggerMessage = "Erro ao tentar salvar o usuario - [ " + e.getMessage() + " ]";
+            loggerMessage = " - [ " + e.getMessage() + " ]";
             logger.info(loggerMessage);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(loggerMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loggerMessage);
         }
     }
 
-    @PostMapping("/calculate")
+    @PostMapping(value = "/calculate", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> calculateOneDigit(@RequestBody String body) {
+        String loggerMessage = "Erro ao tentar calcular o digito unico";
         try {
             JsonObject json = JsonConverterUtils.convertToJsonObject(body);
             Optional<Usuario> usuarioFromRepo = userRepository.findByNome(JsonConverterUtils.getStringJsonValue(json, NOME_USUARIO_JSON_KEY));
@@ -76,10 +79,10 @@ public class UsuarioController {
                 resultado = resultadoRepository.save(resultado);
                 return ResponseEntity.ok(resultado);
             } else {
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.badRequest().body(loggerMessage);
             }
         } catch (Exception e) {
-            String loggerMessage = "Erro ao tentar calcular o digito unico - [ " + e.getMessage() + " ]";
+            loggerMessage = " - [ " + e.getMessage() + " ]";
             logger.error(loggerMessage);
             return ResponseEntity.badRequest().body(loggerMessage);
         }
