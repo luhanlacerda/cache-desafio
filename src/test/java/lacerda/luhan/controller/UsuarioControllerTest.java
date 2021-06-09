@@ -17,6 +17,7 @@ public class UsuarioControllerTest {
 
     public static final String ENDPOINT_USERS_SAVE = "/users/save";
     public static final String ENDPOINT_USERS_CALCULATE = "/users/calculate";
+    public static final String ENDPOINT_USERS_CACHE = "/users/cache";
     @LocalServerPort
     private int port;
 
@@ -38,9 +39,17 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    @Order(6)
     void saveUsuarioSucessfullyTest() {
         RestAssured.with().body(this.usuarioJson).contentType(ContentType.JSON).when().post(ENDPOINT_USERS_SAVE)
                 .then().statusCode(HttpStatus.SC_OK).and().body(Matchers.containsStringIgnoringCase("sucesso"));
+    }
+
+    @Test
+    @Order(7)
+    void saveUsuarioWithSameNameInDBTest() {
+        RestAssured.with().body(this.usuarioJson).contentType(ContentType.JSON).when().post(ENDPOINT_USERS_SAVE)
+                .then().statusCode(HttpStatus.SC_BAD_REQUEST).and().body(Matchers.containsStringIgnoringCase("erro"));
     }
 
     @Test
@@ -63,7 +72,7 @@ public class UsuarioControllerTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void calculateOneDigitWithNoContentWithIdOneTest() {
         this.usuarioJson.put("id", "1");
 
@@ -73,10 +82,23 @@ public class UsuarioControllerTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void calculateOneDigitWithNoIdTest() {
         RestAssured.with().body(this.usuarioJson).contentType(ContentType.JSON).when().post(ENDPOINT_USERS_CALCULATE)
                 .then().statusCode(HttpStatus.SC_BAD_REQUEST).and()
                 .body(Matchers.containsStringIgnoringCase("erro"));
     }
+
+    @Test
+    @Order(5)
+    void getCacheSucessfullyTest() {
+        RestAssured.when().get(ENDPOINT_USERS_CACHE).then().statusCode(HttpStatus.SC_OK).and().body(Matchers.notNullValue());
+    }
+
+    @Test
+    @Order(2)
+    void getEmptyCacheTest() {
+        RestAssured.when().get(ENDPOINT_USERS_CACHE).then().statusCode(HttpStatus.SC_OK).and().body(Matchers.equalTo("{}"));
+    }
+
 }

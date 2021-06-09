@@ -9,6 +9,7 @@ import lacerda.luhan.repository.ResultadoRepository;
 import lacerda.luhan.repository.UsuarioRepository;
 import lacerda.luhan.util.JsonConverterUtils;
 import lacerda.luhan.util.ResultadoConverter;
+import lacerda.luhan.util.SimpleCache;
 import lacerda.luhan.util.UsuarioConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -27,6 +29,9 @@ public class UsuarioController {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
     private static final String NOME_USUARIO_JSON_KEY = "nome";
+
+    @Autowired
+    private SimpleCache simpleCache;
 
     @Autowired
     private UsuarioRepository userRepository;
@@ -54,8 +59,14 @@ public class UsuarioController {
         try {
             if (UsuarioConverter.isDTOValid(usuarioDto)) {
                 Usuario usuario = new Usuario(usuarioDto);
-                userRepository.save(usuario);
-                return ResponseEntity.ok("Usuario criado com sucesso!");
+                Optional<Usuario> usuarioFromRepo = userRepository.findByNome(usuario.getNome());
+                if (!usuarioFromRepo.isPresent()) {
+                    userRepository.save(usuario);
+                    return ResponseEntity.ok("Usuario criado com sucesso!");
+                } else {
+                    loggerMessage += " - já cadastrado!";
+                    return ResponseEntity.badRequest().body(loggerMessage);
+                }
             } else {
                 return ResponseEntity.badRequest().body(loggerMessage);
             }
@@ -77,6 +88,7 @@ public class UsuarioController {
                 Resultado resultado = ResultadoConverter.buildResultado(json, usuario);
                 resultado.calcularDigitoUnico();
                 resultado = resultadoRepository.save(resultado);
+                simpleCache.addElementInCache(resultado);
                 return ResponseEntity.ok(resultado);
             } else {
                 return ResponseEntity.badRequest().body(loggerMessage);
@@ -89,4 +101,16 @@ public class UsuarioController {
 
     }
 
+    @GetMapping(value = "/cache", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getCache() {
+        String loggerMessage = "Erro ao tentar recuperar o cache";
+        try {
+            return ResponseEntity.ok(simpleCache.getMaps());
+        } catch (Exception e) {
+            loggerMessage = " - [ " + e.getMessage() + " ]";
+            logger.error(loggerMessage);
+            return ResponseEntity.badRequest().body(loggerMessage);
+        }
+
+    }
 }
