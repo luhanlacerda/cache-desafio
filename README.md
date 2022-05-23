@@ -1,8 +1,3 @@
-### Introduction 
-Aplicação referente ao desafio do Banco Inter
->By: Luhan Lacerda
->
-
 ### Compilando e Executando a aplicação
 Para executar a aplicação via maven é necessário ter o mesmo instalado e executar o comando abaixo:
 >mvn spring-boot:run
@@ -14,4 +9,3 @@ Para executar os testes da aplicação via maven é necessário ter o mesmo inst
 ### Documentação Swagger
 Ao levantar a aplicação, incluir o endpoint a seguir:
 >/swagger-api-docs.html
-
